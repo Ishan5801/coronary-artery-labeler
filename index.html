@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coronary Atlas · Branch labeling</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="fix.css" />
+  <link rel="stylesheet" href="layout.css?v=fixed-comments" />
+  <link rel="stylesheet" href="overlay.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand"><div class="brand-mark">✦</div><div><strong>coronary atlas</strong><span>branch labeling workspace</span></div></div>
+      <div class="case-meta"><span class="status-dot"></span><span id="caseName">No case loaded</span><span class="divider"></span><span id="saveState">Local workspace</span></div>
+      <div class="topbar-actions"><button class="ghost-btn" id="overlayBtn" type="button">Overlay branches <span>⛶</span></button><button class="ghost-btn" id="resetBtn">Reset workspace</button></div>
+    </header>
+
+    <main>
+      <section class="intro"><div><p class="eyebrow">CAD annotation studio</p><h1>Map every branch.<br><em>Label with confidence.</em></h1></div><p class="intro-copy">Bring your vessel masks and clinical report into one focused workspace. Select a branch to see where it sits in the full coronary tree, then record its CAD status.</p></section>
+
+      <section class="upload-grid">
+        <label class="upload-card primary" id="wholeDrop"><input type="file" id="wholeInput" accept="image/*,.nii,.nii.gz,.nrrd" hidden><span class="step">01</span><span class="upload-icon">◉</span><strong>Entire coronary mask</strong><small id="wholeName">Drop a PNG, JPG, NIfTI or NRRD file</small><button type="button" class="mini-btn">Choose file <span>↗</span></button></label>
+        <label class="upload-card" id="branchDrop"><input type="file" id="branchInput" accept="image/*,.nii,.nii.gz,.nrrd" multiple hidden><span class="step">02</span><span class="upload-icon">⌘</span><strong>Branch-wise masks</strong><small id="branchName">Add one or more branch files</small><button type="button" class="mini-btn">Choose files <span>↗</span></button></label>
+        <label class="upload-card" id="reportDrop"><input type="file" id="reportInput" accept=".pdf,.txt,.csv,.doc,.docx,image/*" hidden><span class="step">03</span><span class="upload-icon">▤</span><strong>Clinical report</strong><small id="reportName">PDF, text or image report</small><button type="button" class="mini-btn">Choose report <span>↗</span></button></label>
+      </section>
+
+      <section class="workspace">
+        <div class="viewer-panel panel" id="wholePanel"><div class="panel-head"><div><p class="eyebrow">Spatial reference</p><h2>Entire coronary mask</h2></div><div class="viewer-actions"><button class="primary-btn split-mask-btn" id="splitMaskBtn" type="button" disabled>Split mask into branches</button><button class="icon-btn fullscreen-btn" data-fullscreen="wholePanel" title="Fullscreen">⛶</button></div></div><div class="canvas-wrap" id="canvasWrap"><div class="empty-view" id="wholeEmpty"><div class="empty-orbit">◎</div><strong>Your full mask will appear here</strong><span>Upload the entire coronary mask to establish the spatial reference.</span></div><canvas id="maskCanvas" hidden></canvas><div class="canvas-hint" id="canvasHint" hidden><span class="legend-swatch full"></span> Full mask <span class="legend-swatch branch"></span> Selected branch</div></div></div>
+        <div class="viewer-panel panel" id="branchPanel"><div class="panel-head"><div><p class="eyebrow">Selected branch</p><h2 id="selectedBranchTitle">Choose a branch</h2></div><div class="viewer-actions"><span class="file-badge" id="selectedBranchBadge">—</span><button class="icon-btn fullscreen-btn" data-fullscreen="branchPanel" title="Fullscreen">⛶</button></div></div><div class="canvas-wrap"><div class="empty-view" id="branchEmpty"><div class="empty-orbit">⌁</div><strong>Click a branch to inspect it</strong><span>The selected branch mask will appear in this window.</span></div><canvas id="branchCanvas" hidden></canvas></div></div>
+        <div class="branch-side panel"><div class="panel-head compact"><div><p class="eyebrow">Quick select</p><h2>Branches</h2></div><span class="file-badge" id="quickCount">0</span></div><div class="quick-list" id="quickList"><div class="quick-empty">Upload branch masks to select them here.</div></div><div class="comments-panel"><div class="comments-head"><p class="eyebrow">Case notes</p><span>Optional</span></div><textarea id="commentsInput" rows="4" placeholder="Add comments about this case…"></textarea></div></div>
+        <div class="mask-actions"><button class="secondary-btn" id="twoViewBtn">Open 2-panel mask view <span>⛶</span></button></div>
+        <aside class="side-column"><div class="report-panel panel" id="reportPanel"><div class="panel-head compact"><div><p class="eyebrow">Reference document</p><h2>Clinical report</h2></div><div class="viewer-actions"><span class="file-badge" id="reportBadge">—</span><button class="icon-btn fullscreen-btn" data-fullscreen="reportPanel" title="Fullscreen">⛶</button></div></div><div class="report-body" id="reportBody"><div class="report-placeholder"><span>▤</span><p>Upload a report to keep the clinical context beside your masks.</p></div></div></div><div class="legend-card"><span class="pulse"></span><div><strong>Annotation guide</strong><p>Review the report, select a branch, and mark whether CAD is present.</p></div></div></aside>
+      </section>
+      <div class="compare-action"><button class="primary-btn" id="threeViewBtn">Open 3-panel view <span>⛶</span></button></div>
+      <div class="compare-overlay" id="compareOverlay" hidden><div class="compare-topbar"><div><p class="eyebrow">Comparison workspace</p><strong>Coronary mask · selected branch · report</strong></div><button class="ghost-btn" id="closeCompare">Close full screen</button></div><div class="compare-grid" id="compareGrid"><section class="compare-pane"><div class="compare-pane-head">Entire coronary mask</div><div class="compare-canvas" id="compareWhole"><div class="compare-empty">Upload the entire mask to view it here.</div></div></section><div class="splitter" data-split="0"></div><section class="compare-pane"><div class="compare-pane-head">Selected branch</div><div class="compare-canvas" id="compareBranch"><div class="compare-empty">Select a branch to view it here.</div></div></section><div class="splitter" data-split="1"></div><section class="compare-pane"><div class="compare-pane-head">Clinical report</div><div class="compare-report" id="compareReport"><div class="compare-empty">Upload a report to view it here.</div></div></section></div></div>
+      <div class="two-overlay" id="twoOverlay" hidden><div class="compare-topbar"><div><p class="eyebrow">Mask comparison</p><strong>Entire coronary mask · selected branch</strong></div><button class="ghost-btn" id="closeTwo">Close full screen</button></div><div class="two-grid" id="twoGrid"><section class="compare-pane"><div class="compare-pane-head">Entire coronary mask</div><div class="compare-canvas" id="twoWhole"><div class="compare-empty">Upload the entire mask to view it here.</div></div></section><div class="splitter" id="twoSplitter"></div><section class="compare-pane"><div class="compare-pane-head">Selected branch</div><div class="compare-canvas" id="twoBranch"><div class="compare-empty">Select a branch to view it here.</div></div></section></div></div>
+      <div class="branch-overlay" id="branchOverlay" hidden><div class="compare-topbar"><div><p class="eyebrow">Full mask overlay</p><strong>All branch masks · color-coded view</strong></div><button class="ghost-btn" id="closeBranchOverlay" type="button">Close full screen</button></div><div class="branch-overlay-body"><section class="branch-overlay-view"><div class="compare-pane-head">Entire coronary mask with branch overlays</div><div class="compare-canvas" id="branchOverlayCanvas"><div class="compare-empty">Upload the entire mask and branch masks to view the overlay.</div></div></section><aside class="branch-overlay-legend"><p class="eyebrow">Legend</p><h2>Branch colors</h2><p class="legend-help">Each uploaded branch is shown in a distinct color over the full mask.</p><div id="branchOverlayLegend"><div class="compare-empty">No branches uploaded yet.</div></div></aside></div></div>
+
+      <section class="branches panel"><div class="panel-head"><div><p class="eyebrow">Branch inventory</p><h2>Label each vessel segment</h2></div><div class="progress-wrap"><span id="progressText">0 of 0 labeled</span><div class="progress"><i id="progressBar"></i></div></div></div><div class="branch-table" id="branchTable"><div class="table-empty"><span>⌁</span><strong>Branch files will appear here</strong><small>Upload branch-wise masks to begin labeling.</small></div></div><div class="footer-actions"><button class="secondary-btn" id="exportBtn">Export labels <span>↓</span></button><span id="exportStatus"></span><button class="primary-btn" id="finishBtn">Finish annotation <span>→</span></button></div></section>
+    </main>
+    <footer><span>CORONARY ATLAS / LOCAL-FIRST WORKSPACE</span><span>Labels stay in this browser until you export them.</span></footer>
+  </div>
+  <script src="https://unpkg.com/vtk.js@35.5.1"></script>
+  <script src="https://unpkg.com/mammoth@1.8.0/mammoth.browser.min.js"></script>
+  <script src="app.js?v=manual-split"></script>
+  <script src="stability.js"></script>
+</body>
+</html>
