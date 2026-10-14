@@ -15,3 +15,5 @@
 .quick-details label{display:flex;flex-direction:column;gap:4px;font-size:10px;color:var(--muted)}
 .quick-details select{border:1px solid var(--line);border-radius:5px;background:#fff;color:var(--ink);padding:6px 7px;font:11px 'DM Sans';width:100%}
 .quick-details .field-error{color:#a94f3d;font-size:10px}
+.completion-hint{font:10px 'DM Mono',monospace;color:var(--muted);padding:2px 12px 10px}
+.completion-hint.ready{color:var(--teal)}
