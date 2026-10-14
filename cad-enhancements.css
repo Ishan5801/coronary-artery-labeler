@@ -11,3 +11,7 @@
 .quick-labels .quick-unsure.active-unsure{background:#fff4d8;color:#806a2e;border-color:#e3cf8f}
 .branch-details .req{color:#a94f3d;font-weight:700}
 .branch-details .opt{color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0}
+.quick-details{margin:8px 0 2px 26px;display:flex;flex-direction:column;gap:8px}
+.quick-details label{display:flex;flex-direction:column;gap:4px;font-size:10px;color:var(--muted)}
+.quick-details select{border:1px solid var(--line);border-radius:5px;background:#fff;color:var(--ink);padding:6px 7px;font:11px 'DM Sans';width:100%}
+.quick-details .field-error{color:#a94f3d;font-size:10px}
