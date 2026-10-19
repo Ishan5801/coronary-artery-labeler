@@ -9,7 +9,7 @@
   function setPresence(id,present){const old=stateFor(id);if(present==='Yes'){labels[id]={...old,present};}else{labels[id]={present,score:'',plaque:''};}renderBranches();scheduleSave()}
   window.getBranchLabelState=stateFor;window.getBranchLabelValue=id=>stateFor(id).present;window.setBranchPresence=setPresence;
   function caseId(){const base=wholeFile?.webkitRelativePath||wholeFile?.name||'';const m=base.match(/\bCVD\d+\b/i);return m?m[0].toUpperCase():''}
-  function updateBadges(){const id=caseId();[['caseIdBadgeWhole','#wholePanel h2'],['caseIdBadgeReport','#reportPanel h2']].forEach(([key,sel])=>{let n=document.getElementById(key);if(!n){n=document.createElement('span');n.id=key;n.className='case-id-badge';$(sel)?.append(' ',n)}n.textContent=id;n.hidden=!id});if($('#caseName'))$('#caseName').textContent=id||'No case loaded';if($('#reportName')&&wholeFile)$('#reportName').textContent='Report loaded';if($('#reportBadge'))$('#reportBadge').hidden=true}
+  function updateBadges(){const id=caseId();[['caseIdBadgeWhole','#wholePanel h2'],['caseIdBadgeReport','#reportPanel h2']].forEach(([key,sel])=>{let n=document.getElementById(key);if(!n){n=document.createElement('span');n.id=key;n.className='case-id-badge';$(sel)?.append(' ',n)}n.textContent=id;n.hidden=!id});if($('#caseName'))$('#caseName').textContent=id||'No case loaded';if($('#reportBadge'))$('#reportBadge').hidden=true}
   const complete=s=>s.present==='No'||s.present==='Unsure'||(s.present==='Yes'&&!!s.score);
   const missingCount=()=>branches.reduce((n,f,i)=>n+(complete(stateFor(idFor(f,i)))?0:1),0);
   function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveLabels,800);if($('#saveState')&&caseId())$('#saveState').textContent='Saving…'}
@@ -31,7 +31,7 @@
   labelRows=function(){return branches.map((f,i)=>{const s=stateFor(idFor(f,i)),name=f.name,side=/_l\.nii(?:\.gz)?$/i.test(name)?'Left':/_r\.nii(?:\.gz)?$/i.test(name)?'Right':'Unsplit';return{index:i+1,file:name,artery:side,cad:s.present==='Yes'?'CAD present':s.present==='No'?'No CAD':s.present==='Unsure'?'Unsure':'Unlabeled',score:s.present==='Yes'?scoreLabel(s.score||''):s.present==='Yes'?'':'',plaque:s.present==='Yes'?(s.plaque||''):'',stenosis:''}})};
   window.renderBranches=enhancedRender;
   const oldLoadWhole=loadWhole;loadWhole=async f=>{await oldLoadWhole(f);updateBadges();scheduleSave()};
-  const oldLoadReport=loadReport;loadReport=async f=>{await oldLoadReport(f);updateBadges();if($('#reportName'))$('#reportName').textContent='Report loaded'};
+  const oldLoadReport=loadReport;loadReport=async f=>{await oldLoadReport(f);updateBadges()};
   const reset=$('#resetBtn'),oldReset=reset.onclick;reset.onclick=function(){oldReset?.call(this);clearTimeout(saveTimer);updateBadges()};
   $('#commentsInput')?.addEventListener('input',scheduleSave);
   $('#quickList')?.addEventListener('click',e=>{const b=e.target.closest('.quick-labels button');if(!b)return;e.stopImmediatePropagation();const i=+b.dataset.index,id=idFor(branches[i],i),old=stateFor(id),next=b.dataset.label==='yes'?'Yes':b.dataset.label==='no'?'No':'Unsure';if(next!=='Yes'&&old.present==='Yes'&&(old.score||old.plaque)&&!window.confirm('Changing this branch away from Yes will clear its CAD-RADS Score and Plaque Burden. Continue?'))return;setPresence(id,next)},true);

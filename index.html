@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="fix.css" />
-  <link rel="stylesheet" href="layout.css?v=fixed-comments" />
+  <link rel="stylesheet" href="layout.css?v=report-sync" />
   <link rel="stylesheet" href="overlay.css" />
   <link rel="stylesheet" href="cad-enhancements.css?v=2" />
 </head>
@@ -27,7 +27,7 @@
       <section class="upload-grid">
         <label class="upload-card primary" id="wholeDrop"><input type="file" id="wholeInput" accept="image/*,.nii,.nii.gz,.nrrd" hidden><span class="step">01</span><span class="upload-icon">◉</span><strong>Entire coronary mask</strong><small id="wholeName">Drop a PNG, JPG, NIfTI or NRRD file</small><button type="button" class="mini-btn">Choose file <span>↗</span></button></label>
         <label class="upload-card" id="branchDrop"><input type="file" id="branchInput" accept="image/*,.nii,.nii.gz,.nrrd" multiple hidden><span class="step">02</span><span class="upload-icon">⌘</span><strong>Branch-wise masks</strong><small id="branchName">Add one or more branch files</small><button type="button" class="mini-btn">Choose files <span>↗</span></button></label>
-        <label class="upload-card" id="reportDrop"><input type="file" id="reportInput" accept=".pdf,.txt,.csv,.doc,.docx,image/*" hidden><span class="step">03</span><span class="upload-icon">▤</span><strong>Clinical report</strong><small id="reportName">PDF, text or image report</small><button type="button" class="mini-btn">Choose report <span>↗</span></button></label>
+        <label class="upload-card" id="reportDrop"><input type="file" id="reportInput" accept=".pdf,.txt,.csv,.doc,.docx,image/*" hidden><input type="file" id="reportManualInput" accept=".pdf,.txt,.csv,.doc,.docx,image/*" hidden><span class="step">03</span><span class="upload-icon">▤</span><strong>Clinical report</strong><small id="reportName">PDF, text or image report</small><button type="button" class="mini-btn">Choose report <span>↗</span></button></label>
       </section>
 
       <section class="workspace">
@@ -35,7 +35,7 @@
         <div class="viewer-panel panel" id="branchPanel"><div class="panel-head"><div><p class="eyebrow">Selected branch</p><h2 id="selectedBranchTitle">Choose a branch</h2></div><div class="viewer-actions"><span class="file-badge" id="selectedBranchBadge">—</span><button class="icon-btn fullscreen-btn" data-fullscreen="branchPanel" title="Fullscreen">⛶</button></div></div><div class="canvas-wrap"><div class="empty-view" id="branchEmpty"><div class="empty-orbit">⌁</div><strong>Click a branch to inspect it</strong><span>The selected branch mask will appear in this window.</span></div><canvas id="branchCanvas" hidden></canvas></div></div>
         <div class="branch-side panel"><div class="panel-head compact"><div><p class="eyebrow">Quick select</p><h2>Branches</h2></div><span class="file-badge" id="quickCount">0</span></div><div class="quick-list" id="quickList"><div class="quick-empty">Upload branch masks to select them here.</div></div><div class="comments-panel"><div class="comments-head"><p class="eyebrow">Case notes</p><span>Optional</span></div><textarea id="commentsInput" rows="4" placeholder="Add comments about this case…"></textarea></div></div>
         <div class="mask-actions"><button class="secondary-btn" id="twoViewBtn">Open 2-panel mask view <span>⛶</span></button></div>
-        <aside class="side-column"><div class="report-panel panel" id="reportPanel"><div class="panel-head compact"><div><p class="eyebrow">Reference document</p><h2>Clinical report</h2></div><div class="viewer-actions"><span class="file-badge" id="reportBadge">—</span><button class="icon-btn fullscreen-btn" data-fullscreen="reportPanel" title="Fullscreen">⛶</button></div></div><div class="report-body" id="reportBody"><div class="report-placeholder"><span>▤</span><p>Upload a report to keep the clinical context beside your masks.</p></div></div></div><div class="legend-card"><span class="pulse"></span><div><strong>Annotation guide</strong><p>Review the report, select a branch, and mark whether CAD is present.</p></div></div></aside>
+        <aside class="side-column"><div class="report-panel panel" id="reportPanel"><div class="panel-head compact"><div><p class="eyebrow">Reference document</p><h2>Clinical report</h2></div><div class="viewer-actions"><button type="button" class="primary-btn sync-report-btn" id="syncReportBtn">Show report</button><span class="file-badge" id="reportBadge">—</span><button class="icon-btn fullscreen-btn" data-fullscreen="reportPanel" title="Fullscreen">⛶</button></div></div><div class="report-body" id="reportBody"><div class="report-placeholder"><span>▤</span><p>Upload a report to keep the clinical context beside your masks.</p></div></div></div><div class="legend-card"><span class="pulse"></span><div><strong>Annotation guide</strong><p>Review the report, select a branch, and mark whether CAD is present.</p></div></div></aside>
       </section>
       <div class="compare-action"><button class="primary-btn" id="threeViewBtn">Open 3-panel view <span>⛶</span></button></div>
       <div class="compare-overlay" id="compareOverlay" hidden><div class="compare-topbar"><div><p class="eyebrow">Comparison workspace</p><strong>Coronary mask · selected branch · report</strong></div><button class="ghost-btn" id="closeCompare">Close full screen</button></div><div class="compare-grid" id="compareGrid"><section class="compare-pane"><div class="compare-pane-head">Entire coronary mask</div><div class="compare-canvas" id="compareWhole"><div class="compare-empty">Upload the entire mask to view it here.</div></div></section><div class="splitter" data-split="0"></div><section class="compare-pane"><div class="compare-pane-head">Selected branch</div><div class="compare-canvas" id="compareBranch"><div class="compare-empty">Select a branch to view it here.</div></div></section><div class="splitter" data-split="1"></div><section class="compare-pane"><div class="compare-pane-head">Clinical report</div><div class="compare-report" id="compareReport"><div class="compare-empty">Upload a report to view it here.</div></div></section></div></div>
@@ -48,7 +48,7 @@
   </div>
   <script src="https://unpkg.com/vtk.js@35.5.1"></script>
   <script src="https://unpkg.com/mammoth@1.8.0/mammoth.browser.min.js"></script>
-  <script src="app.js?v=manual-split"></script>
+  <script src="app.js?v=report-sync"></script>
   <script src="stability.js?v=2"></script>
   <script src="cad-enhancements.js?v=2"></script>
 </body>
