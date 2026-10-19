@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="fix.css" />
-  <link rel="stylesheet" href="layout.css?v=report-sync" />
+  <link rel="stylesheet" href="layout.css?v=exporting" />
   <link rel="stylesheet" href="overlay.css" />
   <link rel="stylesheet" href="cad-enhancements.css?v=2" />
 </head>
@@ -42,14 +42,14 @@
       <div class="two-overlay" id="twoOverlay" hidden><div class="compare-topbar"><div><p class="eyebrow">Mask comparison</p><strong>Entire coronary mask · selected branch</strong></div><button class="ghost-btn" id="closeTwo">Close full screen</button></div><div class="two-grid" id="twoGrid"><section class="compare-pane"><div class="compare-pane-head">Entire coronary mask</div><div class="compare-canvas" id="twoWhole"><div class="compare-empty">Upload the entire mask to view it here.</div></div></section><div class="splitter" id="twoSplitter"></div><section class="compare-pane"><div class="compare-pane-head">Selected branch</div><div class="compare-canvas" id="twoBranch"><div class="compare-empty">Select a branch to view it here.</div></div></section></div></div>
       <div class="branch-overlay" id="branchOverlay" hidden><div class="compare-topbar"><div><p class="eyebrow">Full mask overlay</p><strong>All branch masks · color-coded view</strong></div><button class="ghost-btn" id="closeBranchOverlay" type="button">Close full screen</button></div><div class="branch-overlay-body"><section class="branch-overlay-view"><div class="compare-pane-head">Entire coronary mask with branch overlays</div><div class="compare-canvas" id="branchOverlayCanvas"><div class="compare-empty">Upload the entire mask and branch masks to view the overlay.</div></div></section><aside class="branch-overlay-legend"><p class="eyebrow">Legend</p><h2>Branch colors</h2><p class="legend-help">Each uploaded branch is shown in a distinct color over the full mask.</p><div id="branchOverlayLegend"><div class="compare-empty">No branches uploaded yet.</div></div></aside></div></div>
 
-      <section class="branches panel"><div class="panel-head"><div><p class="eyebrow">Branch inventory</p><h2>Label each vessel segment</h2></div><div class="progress-wrap"><span id="progressText">0 of 0 labeled</span><div class="progress"><i id="progressBar"></i></div></div></div><div class="branch-table" id="branchTable"><div class="table-empty"><span>⌁</span><strong>Branch files will appear here</strong><small>Upload branch-wise masks to begin labeling.</small></div></div><div class="footer-actions"><button class="secondary-btn" id="exportBtn">Export labels <span>↓</span></button><span id="exportStatus"></span><button class="primary-btn" id="finishBtn">Finish annotation <span>→</span></button></div></section>
+      <section class="branches panel"><div class="panel-head"><div><p class="eyebrow">Branch inventory</p><h2>Label each vessel segment</h2></div><div class="progress-wrap"><span id="progressText">0 of 0 labeled</span><div class="progress"><i id="progressBar"></i></div></div></div><div class="branch-table" id="branchTable"><div class="table-empty"><span>⌁</span><strong>Branch files will appear here</strong><small>Upload branch-wise masks to begin labeling.</small></div></div><div class="footer-actions"><button class="secondary-btn" id="exportBtn">Export <span>↓</span></button><span id="exportStatus"></span><button class="primary-btn" id="finishBtn">Finish annotation <span>→</span></button></div></section>
     </main>
     <footer><span>CORONARY ATLAS / LOCAL-FIRST WORKSPACE</span><span>Labels stay in this browser until you export them.</span></footer>
   </div>
   <script src="https://unpkg.com/vtk.js@35.5.1"></script>
   <script src="https://unpkg.com/mammoth@1.8.0/mammoth.browser.min.js"></script>
-  <script src="app.js?v=report-sync"></script>
+  <script src="app.js?v=exporting"></script>
   <script src="stability.js?v=2"></script>
-  <script src="cad-enhancements.js?v=2"></script>
+  <script src="cad-enhancements.js?v=exporting"></script>
 </body>
 </html>
