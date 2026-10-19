@@ -218,32 +218,6 @@ class Handler(SimpleHTTPRequestHandler):
             status = "In progress"
         else:
             status = "Pending"
-        sides = {}
-        details = []
-        by_index = {index: (name, state) for index, name, state in states}
-        for index in range(total):
-            found = by_index.get(index)
-            name = found[0] if found else ""
-            state = found[1] if found else None
-            if re.search(r"_l\.nii", name, re.I):
-                side = "L"
-            elif re.search(r"_r\.nii", name, re.I):
-                side = "R"
-            else:
-                side = "B"
-            sides[side] = sides.get(side, 0) + 1
-            label = f"{side}{sides[side]}"
-            if state is None or not state["present"]:
-                details.append(f"{label}: Unlabeled")
-                continue
-            present = state["present"]
-            if present == "Yes":
-                extras = [f"score {state['score'] or '—'}"]
-                if state["plaque"]:
-                    extras.append(state["plaque"])
-                details.append(f"{label}: Yes ({', '.join(extras)})")
-            else:
-                details.append(f"{label}: {present}")
         branches = f"{labeled_count}/{total}" if total else "—"
         notes = str(entry.get("notes") or "")
         return [
@@ -254,10 +228,39 @@ class Handler(SimpleHTTPRequestHandler):
             best_score or "—",
             best_plaque or "—",
             branches,
-            "; ".join(details) if details else "—",
             notes,
             entry.get("finishedAt") or "",
         ]
+
+    @classmethod
+    def _branch_rows(cls, entry, position):
+        states = cls._branch_states(entry)
+        total = int(entry.get("branchTotal") or 0)
+        by_index = {index: (name, state) for index, name, state in states}
+        count = max(total, (max(by_index) + 1) if by_index else 0)
+        rows = []
+        sides = {}
+        for index in range(count):
+            found = by_index.get(index)
+            name = found[0] if found else ""
+            state = found[1] if found else None
+            if re.search(r"_l\.nii", name, re.I):
+                side = "L"
+            elif re.search(r"_r\.nii", name, re.I):
+                side = "R"
+            else:
+                side = "B"
+            sides[side] = sides.get(side, 0) + 1
+            rows.append([
+                position,
+                entry.get("name"),
+                f"{side}{sides[side]}",
+                name or "—",
+                state["present"] if state and state["present"] else "Unlabeled",
+                (state or {}).get("score") or "",
+                (state or {}).get("plaque") or "",
+            ])
+        return rows
 
     def export_excel(self, parsed):
         folder = (parse_qs(parsed.query).get("folder") or [""])[0]
@@ -286,20 +289,31 @@ class Handler(SimpleHTTPRequestHandler):
             self._json({"error": "openpyxl is not installed. Restart the server to install it."}, 500)
             return
         headers = ["#", "Mask file", "Status", "CAD present", "CAD-RADS score", "Plaque burden",
-                   "Branches", "Branch detail", "Case notes", "Finished at"]
+                   "Branches", "Case notes", "Finished at"]
         workbook = Workbook()
         sheet = workbook.active
         sheet.title = "Cases"
         sheet.append(headers)
         for cell in sheet[1]:
             cell.font = Font(bold=True)
+        branch_sheet = workbook.create_sheet("Branches")
+        branch_headers = ["#", "Mask file", "Branch", "File", "CAD present", "CAD-RADS score", "Plaque burden"]
+        branch_sheet.append(branch_headers)
+        for cell in branch_sheet[1]:
+            cell.font = Font(bold=True)
         for position, entry in enumerate(entries, start=1):
             row = self._excel_row(entry)
             sheet.append([position] + row[1:])
-        widths = [6, 28, 13, 13, 16, 16, 11, 64, 30, 22]
+            for branch_row in self._branch_rows(entry, position):
+                branch_sheet.append(branch_row)
+        widths = [6, 28, 13, 13, 16, 16, 11, 30, 22]
         for index, width in enumerate(widths, start=1):
             sheet.column_dimensions[get_column_letter(index)].width = width
         sheet.freeze_panes = "A2"
+        branch_widths = [6, 28, 9, 22, 13, 16, 16]
+        for index, width in enumerate(branch_widths, start=1):
+            branch_sheet.column_dimensions[get_column_letter(index)].width = width
+        branch_sheet.freeze_panes = "A2"
         buffer = io.BytesIO()
         workbook.save(buffer)
         raw = buffer.getvalue()
