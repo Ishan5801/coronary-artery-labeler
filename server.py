@@ -137,6 +137,10 @@ class Handler(SimpleHTTPRequestHandler):
                     label = self._clean_label(value)
                     if label is not None:
                         clean_labels[key] = label
+            try:
+                time_spent = int(float(item.get("timeSpentMs") or 0))
+            except (TypeError, ValueError):
+                time_spent = 0
             cleaned.append({
                 "name": item["name"],
                 "order": int(item.get("order") or 0),
@@ -144,6 +148,7 @@ class Handler(SimpleHTTPRequestHandler):
                 "finishedAt": str(item.get("finishedAt") or "")[:40],
                 "notes": str(item.get("notes") or "")[:5000],
                 "branchTotal": int(item.get("branchTotal") or 0),
+                "timeSpentMs": max(0, min(time_spent, 2_592_000_000)),
                 "labels": clean_labels,
             })
         try:
@@ -161,6 +166,17 @@ class Handler(SimpleHTTPRequestHandler):
 
     SCORE_RANK = {"1": 1, "2": 2, "3": 3, "4A": 4, "5": 5, "N": 6}
     PLAQUE_RANK = {"P1": 1, "P2": 2, "P3": 3, "P4": 4}
+
+    @staticmethod
+    def _format_duration(ms):
+        seconds = int((ms or 0) // 1000)
+        if seconds <= 0:
+            return "—"
+        hours, rem = divmod(seconds, 3600)
+        minutes, secs = divmod(rem, 60)
+        if hours:
+            return f"{hours}h {minutes:02d}m {secs:02d}s"
+        return f"{minutes}m {secs:02d}s"
 
     @classmethod
     def _branch_states(cls, entry):
@@ -228,6 +244,7 @@ class Handler(SimpleHTTPRequestHandler):
             best_score or "—",
             best_plaque or "—",
             branches,
+            cls._format_duration(entry.get("timeSpentMs")),
             notes,
             entry.get("finishedAt") or "",
         ]
@@ -289,7 +306,7 @@ class Handler(SimpleHTTPRequestHandler):
             self._json({"error": "openpyxl is not installed. Restart the server to install it."}, 500)
             return
         headers = ["#", "Mask file", "Status", "CAD present", "CAD-RADS score", "Plaque burden",
-                   "Branches", "Case notes", "Finished at"]
+                   "Branches", "Time taken", "Case notes", "Finished at"]
         workbook = Workbook()
         sheet = workbook.active
         sheet.title = "Cases"
@@ -306,7 +323,7 @@ class Handler(SimpleHTTPRequestHandler):
             sheet.append([position] + row[1:])
             for branch_row in self._branch_rows(entry, position):
                 branch_sheet.append(branch_row)
-        widths = [6, 28, 13, 13, 16, 16, 11, 30, 22]
+        widths = [6, 28, 13, 13, 16, 16, 11, 14, 30, 22]
         for index, width in enumerate(widths, start=1):
             sheet.column_dimensions[get_column_letter(index)].width = width
         sheet.freeze_panes = "A2"
